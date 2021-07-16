@@ -29,9 +29,9 @@ bool IsChromaSDKAvailable()
     LPBYTE lpBuffer = NULL;
     DWORD  verSize = GetFileVersionInfoSize(fileName.c_str(), &verHandle);
 
-    if (verSize != NULL)
+    if (verSize)
     {
-        LPSTR verData = new char[verSize];
+        LPSTR verData = (LPSTR)malloc(verSize);
 
         if (GetFileVersionInfo(fileName.c_str(), verHandle, verSize, verData))
         {
@@ -42,12 +42,12 @@ bool IsChromaSDKAvailable()
                     VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
                     if (verInfo->dwSignature == 0xfeef04bd)
                     {
-                        const int major = (verInfo->dwFileVersionMS >> 16) & 0xffff;
-                        const int minor = (verInfo->dwFileVersionMS >> 0) & 0xffff;
-                        const int revision = (verInfo->dwFileVersionLS >> 16) & 0xffff;
-                        const int build = (verInfo->dwFileVersionLS >> 0) & 0xffff;
+                        const int major = (verInfo->dwProductVersionMS >> 16) & 0xffff;
+                        const int minor = (verInfo->dwProductVersionMS >> 0) & 0xffff;
+                        const int revision = (verInfo->dwProductVersionMS >> 16) & 0xffff;
+                        const int build = (verInfo->dwProductVersionMS >> 0) & 0xffff;
 
-                        printf("File Version: %d.%d.%d.%d\n", major, minor, revision, build);
+                        printf("Product Version: %d.%d.%d.%d\n", major, minor, revision, build);
 
                         // Anything less than the min version returns false
                         const int minMajor = 3;
@@ -74,7 +74,7 @@ bool IsChromaSDKAvailable()
                 }
             }
         }
-        delete[] verData;
+        free(verData);
     }
 
     return result;
@@ -84,11 +84,11 @@ int main()
 {
     if (IsChromaSDKAvailable())
     {
-        cout << "ChromaSDK is available!" << endl;
+        printf("ChromaSDK is available!\r\n");
     }
     else
     {
-        cerr << "ChromaSDK is not available!" << endl;
+        fprintf(stderr, "ChromaSDK is not available!\r\n");
     }
     return 0;
 }
