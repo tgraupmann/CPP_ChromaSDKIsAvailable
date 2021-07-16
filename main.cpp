@@ -10,11 +10,11 @@ using namespace std;
 
 bool IsChromaSDKAvailable()
 {
-    string fileName;
+    wstring fileName;
 #ifdef _WIN64
-    fileName = "C:\\Program Files\\Razer Chroma SDK\\bin\\RzChromaSDK64.dll";
+    fileName = L"C:\\Program Files\\Razer Chroma SDK\\bin\\RzChromaSDK64.dll";
 #else
-    fileName = "C:\\Program Files (x86)\\Razer Chroma SDK\\bin\\RzChromaSDK.dll";
+    fileName = L"C:\\Program Files (x86)\\Razer Chroma SDK\\bin\\RzChromaSDK.dll";
 #endif
     fs::path p = fileName.c_str();
     if (!fs::exists(p))
@@ -22,20 +22,18 @@ bool IsChromaSDKAvailable()
         return false;
     }
 
-    wstring szVersionFile(fileName.begin(), fileName.end());
-
     bool result = false;
 
     DWORD  verHandle = 0;
     UINT   size = 0;
     LPBYTE lpBuffer = NULL;
-    DWORD  verSize = GetFileVersionInfoSize(szVersionFile.c_str(), &verHandle);
+    DWORD  verSize = GetFileVersionInfoSize(fileName.c_str(), &verHandle);
 
     if (verSize != NULL)
     {
         LPSTR verData = new char[verSize];
 
-        if (GetFileVersionInfo(szVersionFile.c_str(), verHandle, verSize, verData))
+        if (GetFileVersionInfo(fileName.c_str(), verHandle, verSize, verData))
         {
             if (VerQueryValue(verData, L"\\", (VOID FAR * FAR*) & lpBuffer, &size))
             {
